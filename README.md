@@ -1,6 +1,5 @@
 # Chrono & Pixel
 
-# Time Line & Pixel
 
 Bienvenue sur le dépôt du projet **Time Line & Pixel** ! Ce site web a une double vocation : l'apprentissage ludique de l'histoire des technologies et la création artistique.
 
@@ -10,7 +9,7 @@ Bienvenue sur le dépôt du projet **Time Line & Pixel** ! Ce site web a une dou
 
 ## À propos du projet
 
-**Time Line & Pixel** est un espace pédagogique et créatif qui propose deux expériences principales :
+**Chrono & Pixel** est un espace pédagogique et créatif qui propose deux expériences principales :
 
 1.  **Des Timelines Interactives :** Explorez des sujets passionnants comme l'histoire de l'IA, des langages informatiques ou de la conquête spatiale à travers des kits de cartes à manipuler. Chaque thème peut être téléchargé en PDF pour des ateliers en présentiel ou exploré directement en ligne via un jeu de classement.
 
