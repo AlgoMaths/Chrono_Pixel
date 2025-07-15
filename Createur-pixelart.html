@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créateur de Pixel Art - Time Line & Pixel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/custom.css">
+</head>
+<body class="text-gray-200 p-4 sm:p-8">
+
+    <div class="w-full max-w-5xl mx-auto">
+        <header class="text-center mb-6">
+            <h1 class="text-4xl md:text-5xl font-bold text-purple-400 text-glow-purple font-['VT323']">CRÉATEUR DE PIXEL ART</h1>
+            <p class="text-gray-400 mt-2">Chargez une image pour la transformer en véritable pixel art.</p>
+        </header>
+
+        <main class="bg-black bg-opacity-40 border border-purple-400 border-opacity-50 rounded-lg p-4 sm:p-8 shadow-lg shadow-purple-500/10">
+            <!-- Zone des contrôles -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <!-- Contrôle de Fichier -->
+                <div class="flex flex-col items-center justify-center">
+                    <label for="imageLoader" class="w-full text-center bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-lg cursor-pointer transition-all duration-300">
+                        CHOISIR UNE IMAGE
+                    </label>
+                    <input type="file" id="imageLoader" name="imageLoader" class="hidden"/>
+                    <span id="fileName" class="text-xs text-gray-400 mt-2 text-center truncate w-full px-2">Aucun fichier</span>
+                </div>
+
+                <!-- Curseur de Pixelisation -->
+                <div class="flex flex-col items-center justify-center">
+                    <label for="pixelSize" class="block text-sm font-medium text-gray-300 mb-2">Taille pixels: <span id="pixelValue" class="font-bold text-cyan-400">12</span></label>
+                    <input id="pixelSize" type="range" min="2" max="50" value="12" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                </div>
+                
+                <!-- Sélecteur de Palette -->
+                <div class="flex flex-col items-center justify-center">
+                    <label for="paletteSelector" class="block text-sm font-medium text-gray-300 mb-2">Palette</label>
+                    <select id="paletteSelector" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 p-2.5">
+                        <option value="none">Couleurs Originales</option>
+                        <option value="pico8">PICO-8</option>
+                        <option value="gameboy">Game Boy</option>
+                        <option value="grayscale">Niveaux de gris</option>
+                        <option value="sepia">Sépia</option>
+                        <option value="cga">Ancien PC (CGA)</option>
+                    </select>
+                </div>
+
+                <!-- Bouton de Téléchargement -->
+                <div class="flex flex-col items-center justify-center">
+                     <button id="downloadButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed" disabled>
+                        TELECHARGER
+                    </button>
+                </div>
+            </div>
+
+            <!-- Zone d'affichage de l'image -->
+            <div class="w-full bg-dots-pattern rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center" style="min-height: 50vh; background-image: radial-gradient(circle, #2c3340 1px, transparent 1px); background-size: 1rem 1rem;">
+                <canvas id="canvas" class="max-w-full max-h-full rounded-md hidden"></canvas>
+                <p id="placeholderText" class="text-gray-500 font-['VT323'] text-2xl">VOTRE IMAGE APPARAÎTRA ICI</p>
+            </div>
+        </main>
+        
+        <div class="text-center mt-8">
+            <a href="index.html" class="inline-block bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 px-4 rounded-md transition-all duration-300">
+                &lt; RETOUR À L'ACCUEIL
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const imageLoader = document.getElementById('imageLoader');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const pixelSizeSlider = document.getElementById('pixelSize');
+        const pixelValueSpan = document.getElementById('pixelValue');
+        const paletteSelector = document.getElementById('paletteSelector');
+        const downloadButton = document.getElementById('downloadButton');
+        const placeholderText = document.getElementById('placeholderText');
+        const fileNameSpan = document.getElementById('fileName');
+        let originalImage = null;
+        const palettes = {
+            grayscale: ['#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#FFFFFF'],
+            sepia: ['#705746', '#3A2A1F', '#A38B7A', '#D4C3B6', '#EFE5DD'],
+            gameboy: ['#0f380f', '#306230', '#8bac0f', '#9bbc0f'],
+            cga: ['#000000', '#55FFFF', '#FF55FF', '#FFFFFF'],
+            pico8: ['#000000', '#1D2B53', '#7E2553', '#008751', '#AB5236', '#5F574F', '#C2C3C7', '#FFF1E8', '#FF004D', '#FFA300', '#FFEC27', '#00E436', '#29ADFF', '#83769C', '#FF77A8', '#FFCCAA']
+        };
+        const palettesRgb = {};
+        for (const key in palettes) {
+            palettesRgb[key] = palettes[key].map(hexToRgb);
+        }
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : [0,0,0];
+        }
+        function colorDistance(rgb1, rgb2) {
+            return (rgb1[0] - rgb2[0]) ** 2 + (rgb1[1] - rgb2[1]) ** 2 + (rgb1[2] - rgb2[2]) ** 2;
+        }
+        function findClosestColor(pixelRgb, paletteRgb) {
+            let closestColor = paletteRgb[0];
+            let minDistance = colorDistance(pixelRgb, closestColor);
+            for (let i = 1; i < paletteRgb.length; i++) {
+                let distance = colorDistance(pixelRgb, paletteRgb[i]);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestColor = paletteRgb[i];
+                }
+            }
+            return closestColor;
+        }
+        function drawPixelated() {
+            if (!originalImage) return;
+            const pixelSize = parseInt(pixelSizeSlider.value, 10);
+            const selectedPaletteKey = paletteSelector.value;
+            const smallWidth = Math.max(1, Math.floor(originalImage.width / pixelSize));
+            const smallHeight = Math.max(1, Math.floor(originalImage.height / pixelSize));
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = smallWidth;
+            tempCanvas.height = smallHeight;
+            const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+            tempCtx.drawImage(originalImage, 0, 0, smallWidth, smallHeight);
+            if (selectedPaletteKey !== 'none') {
+                const paletteRgb = palettesRgb[selectedPaletteKey];
+                const imageData = tempCtx.getImageData(0, 0, smallWidth, smallHeight);
+                const data = imageData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const pixelRgb = [data[i], data[i + 1], data[i + 2]];
+                    const closestColor = findClosestColor(pixelRgb, paletteRgb);
+                    data[i] = closestColor[0];
+                    data[i + 1] = closestColor[1];
+                    data[i + 2] = closestColor[2];
+                }
+                tempCtx.putImageData(imageData, 0, 0);
+            }
+            canvas.width = smallWidth * pixelSize;
+            canvas.height = smallHeight * pixelSize;
+            const smallImageData = tempCtx.getImageData(0, 0, smallWidth, smallHeight).data;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < smallHeight; y++) {
+                for (let x = 0; x < smallWidth; x++) {
+                    const index = (y * smallWidth + x) * 4;
+                    const r = smallImageData[index];
+                    const g = smallImageData[index + 1];
+                    const b = smallImageData[index + 2];
+                    ctx.fillStyle = `rgb(${r},${g},${b})`;
+                    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                }
+            }
+        }
+        const redraw = () => { if (originalImage) { requestAnimationFrame(drawPixelated); } };
+        imageLoader.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                originalImage = new Image();
+                originalImage.onload = () => {
+                    placeholderText.style.display = 'none';
+                    canvas.style.display = 'block';
+                    downloadButton.disabled = false;
+                    redraw();
+                };
+                originalImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+            fileNameSpan.textContent = file.name;
+        });
+        pixelSizeSlider.addEventListener('input', (e) => {
+            pixelValueSpan.textContent = e.target.value;
+            redraw();
+        });
+        paletteSelector.addEventListener('change', redraw);
+        downloadButton.addEventListener('click', () => {
+            if (originalImage) {
+                const link = document.createElement('a');
+                link.download = 'pixel-art.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        });
+    </script>
+</body>
+</html>
