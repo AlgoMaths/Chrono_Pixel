@@ -3,7 +3,7 @@
 
 Bienvenue sur le dépôt du projet **Time Line & Pixel** ! Ce site web a une double vocation : l'apprentissage ludique de l'histoire des technologies et la création artistique.
 
-**Accéder au site :** [AlgoMaths/Chrono_Pixel.github.io](https://Algomaths/Chrono_Pixel.github.io) 
+**Accéder au site :** [AlgoMaths/Chrono_Pixel.github.io](https://Algomaths.github.io/Chrono_Pixel/) 
 
 ---
 
