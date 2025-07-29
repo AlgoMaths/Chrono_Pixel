@@ -13,6 +13,12 @@ body {
 .text-glow-green { text-shadow: 0 0 5px rgba(52, 211, 153, 0.8), 0 0 10px rgba(52, 211, 153, 0.6); }
 .text-glow-purple { text-shadow: 0 0 5px rgba(192, 132, 252, 0.8), 0 0 10px rgba(192, 132, 252, 0.6); }
 .text-glow-yellow { text-shadow: 0 0 5px rgba(250, 204, 21, 0.8), 0 0 10px rgba(250, 204, 21, 0.6); }
+.text-glow-orange { text-shadow: 0 0 5px rgba(251, 146, 60, 0.8), 0 0 10px rgba(251, 146, 60, 0.6); }
+.text-glow-teal { text-shadow: 0 0 5px rgba(45, 212, 191, 0.8), 0 0 10px rgba(45, 212, 191, 0.6); }
+.text-glow-rose { text-shadow: 0 0 5px rgba(251, 113, 133, 0.8), 0 0 10px rgba(251, 113, 133, 0.6); }
+.text-glow-indigo { text-shadow: 0 0 5px rgba(129, 140, 248, 0.8), 0 0 10px rgba(129, 140, 248, 0.6); }
+.text-glow-amber { text-shadow: 0 0 5px rgba(252, 165, 165, 0.8), 0 0 10px rgba(252, 165, 165, 0.6); }
+.text-glow-sky { text-shadow: 0 0 5px rgba(56, 189, 248, 0.8), 0 0 10px rgba(56, 189, 248, 0.6); }
 
 .img-glow {
     filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.7)) drop-shadow(0 0 8px rgba(139, 92, 246, 0.5));
